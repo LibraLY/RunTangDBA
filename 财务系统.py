@@ -279,8 +279,14 @@ class Controller:
     def excel(self): 
         input1 = self.Input.dateEdit.text()
         input2 = self.Input.dateEdit_2.text() 
-        self.year1='01'+'-'+input1[5:6]+'月 '+'-'+input1[2:4]
-        self.year2='01'+'-'+input2[5:6]+'月 '+'-'+input2[2:4]
+        if(input1[6:7]=='/'):
+            self.year1='01'+'-'+input1[5:6]+'月 '+'-'+input1[2:4]
+        else:
+            self.year1='01'+'-'+input1[5:7]+'月 '+'-'+input1[2:4]
+        if(input2[6:7]=='/'):
+            self.year2='01'+'-'+input2[5:6]+'月 '+'-'+input2[2:4]
+        else:
+            self.year2='01'+'-'+input2[5:7]+'月 '+'-'+input2[2:4]
         try:
             self.ora.Ora_Select_List("""select e.eno"收款人编号",e.eaccount"收款人账号",e.ename"收款人名称",b.branch"收方开户支行",c.l_name"收款人所在省",l.l_name"收款人所在市",e.email"收方邮件地址",e.phone"收方移动电话",p.Currency"币种",p.branch"付款分行",p.settlement_method"结算方式",p.business_types"业务种类",p.account"付方账号",to_char(sysdate,'yyyymmdd')"期望日",to_char(sysdate,'hh24miss')"期望时间",p.purposes"用途",sum(s.amount)"金额",b.cnaps_code"收方联行号",b.bname"收方开户银行" 
                                      from employees e,bank b,FDL_CITY c,FDL_CITY l,payment p,salary s 

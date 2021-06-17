@@ -42,7 +42,7 @@ class message(QDialog):
         QMessageBox.critical(self,'严重警告','产生错误或者异常,请重新输入', QMessageBox.Retry | QMessageBox.Abort | QMessageBox.Ignore , QMessageBox.Retry)
     #关于对话框槽函数
     def aboutBtn_clicked(self):
-        QMessageBox.about(self,"关于","润堂劳务公司财务系统，可对员工信息与工资进行增删查改等操作\t \n \nCopyright © 2021-2021 Runtang.Co.Ltd . All rights reserved. \t")
+        QMessageBox.about(self,"关于","润堂劳务公司财务系统\t \n \nCopyright © 2021-2021 Runtang.Co.Ltd . All rights reserved. \t")
 
     #关于Qt对话框槽函数
     def aboutQtBtn_clicked(self):
