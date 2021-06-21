@@ -10,6 +10,7 @@ from Test import Ui_MainWindow as B_Ui # b界面的库
 from Input import Ui_MainWindow as C_Ui
 from insertemp import Ui_MainWindow as E_Ui
 from insertsal import Ui_MainWindow as F_Ui
+from payment import Ui_MainWindow as G_Ui
 from message import message
 from OpOracle import OpOracle
 from PyQt5 import QtCore, QtWidgets
@@ -34,6 +35,7 @@ class OperateWindow(QtWidgets.QMainWindow, B_Ui):
     switch_window3 = QtCore.pyqtSignal()
     switch_window4 = QtCore.pyqtSignal()
     switch_window5 = QtCore.pyqtSignal()
+    switch_window6 = QtCore.pyqtSignal()
     def __init__(self):
         super(OperateWindow, self).__init__()
         self.setupUi(self)
@@ -42,6 +44,7 @@ class OperateWindow(QtWidgets.QMainWindow, B_Ui):
         self.OutButton.clicked.connect(self.out)
         self.excelButton.clicked.connect(self.Input)
         self.aboutButton.clicked.connect(self.about)
+        self.PayButton.clicked.connect(self.payment)
     def insertemp(self):
         self.switch_window1.emit()
     def insertsal(self):
@@ -52,6 +55,8 @@ class OperateWindow(QtWidgets.QMainWindow, B_Ui):
         self.switch_window4.emit()
     def about(self):
         self.switch_window5.emit()
+    def payment(self):
+        self.switch_window6.emit()
 
 class InputWindow(QtWidgets.QMainWindow, C_Ui):
     switch_window1 = QtCore.pyqtSignal()
@@ -115,7 +120,31 @@ class insertsalWindow(QtWidgets.QMainWindow, F_Ui):
         self.switch_window2.emit()    
     def check(self):
         self.switch_window5.emit() 
-        
+
+class insertpaymentWindow(QtWidgets.QMainWindow, G_Ui):   
+    switch_window1 = QtCore.pyqtSignal()
+    switch_window2 = QtCore.pyqtSignal()
+    switch_window3 = QtCore.pyqtSignal()
+    switch_window4 = QtCore.pyqtSignal()
+    switch_window5 = QtCore.pyqtSignal()
+    def __init__(self):
+        super(insertpaymentWindow, self).__init__()
+        self.setupUi(self)
+        self.pushButton.clicked.connect(self.insert)
+        self.pushButton_3.clicked.connect(self.update)
+        self.pushButton_4.clicked.connect(self.delete)
+        self.pushButton_5.clicked.connect(self.EXIT)
+        self.pushButton_2.clicked.connect(self.check)
+    def insert(self):
+        self.switch_window1.emit()
+    def update(self):
+        self.switch_window3.emit()
+    def delete(self):
+        self.switch_window4.emit()
+    def EXIT(self):
+        self.switch_window5.emit()    
+    def check(self):
+        self.switch_window2.emit() 
 class Controller:
     def __init__(self):
         self.mess = message()
@@ -158,14 +187,23 @@ class Controller:
         self.insertsal.switch_window3.connect(self.sal_update)
         self.insertsal.switch_window4.connect(self.sal_delete)
         self.insertsal.switch_window5.connect(self.sal_check)
+    def show_payment(self):
+        self.pay = insertpaymentWindow()
+        self.pay.setStyleSheet('QMainWindow{background-color:}')
+        self.pay.show()
+        self.pay.switch_window1.connect(self.pay_insert) 
+        self.pay.switch_window5.connect(self.pay.close)
+        self.pay.switch_window3.connect(self.pay_update)
+        self.pay.switch_window4.connect(self.pay_delete)
+        self.pay.switch_window2.connect(self.pay_check)   
     def emp_insert(self):
         input1 = self.insertemp.lineEdit.text()    
         input2 = self.insertemp.lineEdit_2.text()
         input3 = self.insertemp.lineEdit_3.text() 
-        input4 = self.insertemp.lineEdit_4.text()    
+        input4 = self.insertemp.lineEdit_4.text()
         input5 = self.insertemp.lineEdit_5.text()
         input6 = self.insertemp.lineEdit_6.text()
-        input7 = self.insertemp.lineEdit_7.text()    
+        input7 = self.insertemp.lineEdit_7.text()
         input8 = self.insertemp.lineEdit_8.text()
         input9 = self.insertemp.lineEdit_9.text() 
         try:
@@ -182,6 +220,19 @@ class Controller:
         input3 = self.insertsal.lineEdit_3.text() 
         try:
            self.ora.Ora_IUD_Multi('insert into salary values (:eno,:YEAR_MONTH,:AMOUNT)',[{'eno':input1,'YEAR_MONTH':input2,'AMOUNT':input3}])
+        except:
+            self.mess.criticalBtn_clicked()
+        else:
+            self.mess.infoBtn_clicked()
+    def pay_insert(self):
+        input1 = self.pay.lineEdit.text()    
+        input2 = self.pay.lineEdit_2.text()
+        input3 = self.pay.lineEdit_3.text()
+        input4 = self.pay.lineEdit_4.text()
+        input5 = self.pay.lineEdit_5.text()
+        input6 = self.pay.lineEdit_6.text()
+        try:
+           self.ora.Ora_IUD_Multi('insert into payment values (:ACCOUNT,:PURPOSES,:CURRENCY,:BRANCH,:SETTLEMENT_METHOD,:BUSINESS_TYPES)',[{'ACCOUNT':input1,'PURPOSES':input2,'CURRENCY':input3,'BRANCH':input4,'SETTLEMENT_METHOD':input5,'BUSINESS_TYPES':input6}])
         except:
             self.mess.criticalBtn_clicked()
         else:
@@ -216,11 +267,24 @@ class Controller:
             self.mess.criticalBtn_clicked()
         else:
             self.mess.infoBtn_clicked()
+    def pay_update(self):
+        input1 = self.pay.lineEdit.text()    
+        input2 = self.pay.lineEdit_2.text()
+        input3 = self.pay.lineEdit_3.text()
+        input4 = self.pay.lineEdit_4.text()
+        input5 = self.pay.lineEdit_5.text()
+        input6 = self.pay.lineEdit_6.text()
+        try:
+            self.ora.Ora_IUD_Multi('update payment set PURPOSES=:PURPOSES,CURRENCY=:CURRENCY,BRANCH=:BRANCH,SETTLEMENT_METHOD=:SETTLEMENT_METHOD,BUSINESS_TYPES=:BUSINESS_TYPES where ACCOUNT=:ACCOUNT',[{'ACCOUNT':input1,'PURPOSES':input2,'CURRENCY':input3,'BRANCH':input4,'SETTLEMENT_METHOD':input5,'BUSINESS_TYPES':input6}])
+        except:
+            self.mess.criticalBtn_clicked()
+        else:
+            self.mess.infoBtn_clicked()
     def sal_delete(self):
         input1 = self.insertsal.lineEdit.text()    
         input2 = self.insertsal.lineEdit_2.text()
         try:
-            self.ora.Ora_IUD_Multi('delete from salary  where eno=:eno and YEAR_MONTH=:YEAR_MONTH',[{'eno':input1,'YEAR_MONTH':input2}])
+            self.ora.Ora_IUD_Multi('delete from salary where eno=:eno and YEAR_MONTH=:YEAR_MONTH',[{'eno':input1,'YEAR_MONTH':input2}])
         except:
             self.mess.criticalBtn_clicked()
         else:
@@ -230,6 +294,14 @@ class Controller:
         try:
             self.ora.Ora_IUD_Multi('delete from salary where eno=:eno ',[{'eno':input1}])
             self.ora.Ora_IUD_Multi('delete from employees where eno=:eno',[{'eno':input1}])
+        except:
+            self.mess.criticalBtn_clicked()
+        else:
+            self.mess.infoBtn_clicked()
+    def pay_delete(self):
+        input1 = self.pay.lineEdit.text()
+        try:
+            self.ora.Ora_IUD_Multi('delete from payment where ACCOUNT=:ACCOUNT',[{'ACCOUNT':input1}])
         except:
             self.mess.criticalBtn_clicked()
         else:
@@ -263,7 +335,6 @@ class Controller:
             self.mess.criticalBtn_clicked()
         else:
             self.mess.infoBtn_clicked()
-            self.Input.close()
     
     def sal_check(self):
         try:
@@ -275,10 +346,29 @@ class Controller:
             self.mess.criticalBtn_clicked()
         else:
             self.mess.infoBtn_clicked()
-            self.Input.close()        
+
+    def pay_check(self):
+        try:
+            input1 = self.pay.lineEdit.text()    
+            PURPOSES = self.ora.Ora_select_out('select PURPOSES from payment where ACCOUNT=:ACCOUNT',{'ACCOUNT':input1})
+            self.pay.lineEdit_2.setText(PURPOSES)
+            CURRENCY = self.ora.Ora_select_out('select CURRENCY from payment where ACCOUNT=:ACCOUNT',{'ACCOUNT':input1})
+            self.pay.lineEdit_3.setText(CURRENCY)
+            BRANCH = self.ora.Ora_select_out('select BRANCH from payment where ACCOUNT=:ACCOUNT',{'ACCOUNT':input1})
+            self.pay.lineEdit_4.setText(BRANCH)
+            SETTLEMENT_METHOD = self.ora.Ora_select_out('select SETTLEMENT_METHOD from payment where ACCOUNT=:ACCOUNT',{'ACCOUNT':input1})
+            self.pay.lineEdit_5.setText(SETTLEMENT_METHOD)
+            BUSINESS_TYPES = self.ora.Ora_select_out('select BUSINESS_TYPES from payment where ACCOUNT=:ACCOUNT',{'ACCOUNT':input1})
+            self.pay.lineEdit_6.setText(BUSINESS_TYPES)
+        except:
+            self.mess.criticalBtn_clicked()
+        else:
+            self.mess.infoBtn_clicked()
+    
     def excel(self): 
         input1 = self.Input.dateEdit.text()
         input2 = self.Input.dateEdit_2.text() 
+        input3 = self.Input.lineEdit_2.text()
         if(input1[6:7]=='/'):
             self.year1='01'+'-'+input1[5:6]+'月 '+'-'+input1[2:4]
         else:
@@ -290,16 +380,15 @@ class Controller:
         try:
             self.ora.Ora_Select_List("""select e.eno"收款人编号",e.eaccount"收款人账号",e.ename"收款人名称",b.branch"收方开户支行",c.l_name"收款人所在省",l.l_name"收款人所在市",e.email"收方邮件地址",e.phone"收方移动电话",p.Currency"币种",p.branch"付款分行",p.settlement_method"结算方式",p.business_types"业务种类",p.account"付方账号",to_char(sysdate,'yyyymmdd')"期望日",to_char(sysdate,'hh24miss')"期望时间",p.purposes"用途",sum(s.amount)"金额",b.cnaps_code"收方联行号",b.bname"收方开户银行" 
                                      from employees e,bank b,FDL_CITY c,FDL_CITY l,payment p,salary s 
-                                     where b.CNAPS_CODE=e.CNAPS_CODE and l.ID=e.ID and s.eno=e.eno and c.SERIAL_NO=l.PARENT_ID and s.YEAR_MONTH between :month1 and :month2 
+                                     where b.CNAPS_CODE=e.CNAPS_CODE and l.ID=e.ID and s.eno=e.eno and c.SERIAL_NO=l.PARENT_ID and p.account=:account and  s.YEAR_MONTH between :month1 and :month2 
                                      group by e.eno,e.eaccount,e.ename,b.branch,c.l_name,l.l_name,e.email,e.phone,p.Currency,p.branch,p.settlement_method,p.business_types,p.account,to_char(sysdate,'yyyymmdd'),to_char(sysdate,'hh24miss'),p.purposes,b.cnaps_code,b.bname
                                      order by e.eno""",
-                                     {'month1':self.year1,'month2':self.year2})
+                                     {'month1':self.year1,'month2':self.year2,'account':input3})
             self.ora.Ora_excel(self.Input.lineEdit.text())
         except:
             self.mess.criticalBtn_clicked()
         else:
             self.mess.infoBtn_clicked()
-            self.Input.close()
     
     def Input_name(self):
         self.Input = InputWindow()
@@ -323,6 +412,7 @@ class Controller:
             self.operate.switch_window3.connect(self.out)
             self.operate.switch_window4.connect(self.Input_name)
             self.operate.switch_window5.connect(self.about)
+            self.operate.switch_window6.connect(self.show_payment)
 
 
 
